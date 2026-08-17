@@ -22,7 +22,11 @@ import {
   CreditCard,
   FileCheck2,
   Clock,
-  Heart
+  Heart,
+  FlaskConical,
+  CheckCircle2,
+  ShieldAlert,
+  DollarSign
 } from 'lucide-react';
 
 const INITIAL_MESSAGE: Message = {
@@ -36,11 +40,67 @@ const INITIAL_MESSAGE: Message = {
   ],
 };
 
+const TEST_SCENARIOS = [
+  {
+    category: "1. Core Clinic Info & Booking",
+    icon: Clock,
+    tests: [
+      { prompt: "What are your opening hours on weekdays and weekends?", expected: "Mon-Fri 8am-5:30pm, Sat 8:30am-12pm, Sun closed." },
+      { prompt: "How do I book an appointment?", expected: "Links to online booking portal + same-day critical care info." },
+      { prompt: "Where is the clinic and is there parking?", expected: "2800 Gold Coast Hwy, Surfers Paradise + undercover parking." },
+      { prompt: "Who owns and runs Gold Coast Vet Surgery?", expected: "Independent, family owned husband & wife vet team (no corporate chain)." }
+    ]
+  },
+  {
+    category: "2. Puppy & Kitten Special Care",
+    icon: Heart,
+    tests: [
+      { prompt: "Do you have free health checks for new puppies or kittens?", expected: "Free 1st-week vet check + toilet/behaviour & parasite advice." },
+      { prompt: "Do you run Puppy Preschool classes?", expected: "Yes, puppy preschool classes offered — ask clinic for schedule." }
+    ]
+  },
+  {
+    category: "3. After-Hours Emergency Guardrail",
+    icon: ShieldAlert,
+    tests: [
+      { prompt: "My dog ate something toxic at 10pm, what should I do?", expected: "Refers immediately to Animal Emergency Service (AES) Carrara (07) 5559 1599." },
+      { prompt: "Are you open on Sunday for emergencies?", expected: "Closed Sundays, AES on call at 104 Eastlake St, Carrara." }
+    ]
+  },
+  {
+    category: "4. Pricing Guardrail (No Invented Prices)",
+    icon: DollarSign,
+    tests: [
+      { prompt: "How much does a dog desexing surgery cost?", expected: "Refuses fixed price quote, explains consult estimates, gives phone/booking." },
+      { prompt: "What is your consultation fee?", expected: "Transparent estimate provided at consult, no fixed quotes over chat." }
+    ]
+  },
+  {
+    category: "5. Payment Plans & Pet Insurance",
+    icon: CreditCard,
+    tests: [
+      { prompt: "What payment plans do you accept?", expected: "ZipMoney Mediplan (6 mo interest-free) and VetPay (6-12 mo)." },
+      { prompt: "How does pet insurance work with your clinic?", expected: "Direct e-claims through software, no forms or extra charge." },
+      { prompt: "Can I pay by cheque?", expected: "Cheques not accepted. Cash, EFTPOS, VISA, Mastercard accepted." }
+    ]
+  },
+  {
+    category: "6. Medical & Surgical Services",
+    icon: Stethoscope,
+    tests: [
+      { prompt: "What services and surgeries do you provide?", expected: "Triennial vaccines, desexing, X-ray, ultrasound, soft tissue & orthopaedic." },
+      { prompt: "Do you offer dental cleaning and dental X-rays?", expected: "Ultrasonic scaling, polishing, extractions, digital dental X-rays on site." },
+      { prompt: "Is grooming available on site?", expected: "Yes, Polished Pets located downstairs." }
+    ]
+  }
+];
+
 export const ChatWidget: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showFaqDrawer, setShowFaqDrawer] = useState(false);
+  const [showTesterDrawer, setShowTesterDrawer] = useState(false);
   const [faqSearch, setFaqSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -206,7 +266,7 @@ export const ChatWidget: React.FC = () => {
       <div className="w-full bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col h-[680px] sm:h-[720px] max-h-[82vh] overflow-hidden relative">
         
         {/* Chatbot Header - bg-navy */}
-        <div className="bg-navy p-4 px-5 sm:px-6 flex items-center justify-between text-white shadow-sm z-10">
+        <div className="bg-navy p-4 px-4 sm:px-6 flex items-center justify-between text-white shadow-sm z-10">
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse shrink-0"></div>
             <div>
@@ -221,6 +281,20 @@ export const ChatWidget: React.FC = () => {
 
           {/* Quick Header Tools */}
           <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* Quick Test Suite Launcher */}
+            <button
+              type="button"
+              onClick={() => {
+                setShowTesterDrawer(true);
+                setShowFaqDrawer(false);
+              }}
+              className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-orange hover:brightness-110 text-white flex items-center gap-1.5 transition-all shadow-xs"
+              title="Test sample questions by category"
+            >
+              <FlaskConical className="w-3.5 h-3.5" />
+              <span>Test Suite</span>
+            </button>
+
             {speechSupported && (
               <button
                 type="button"
@@ -238,7 +312,10 @@ export const ChatWidget: React.FC = () => {
 
             <button
               type="button"
-              onClick={() => setShowFaqDrawer(!showFaqDrawer)}
+              onClick={() => {
+                setShowFaqDrawer(!showFaqDrawer);
+                setShowTesterDrawer(false);
+              }}
               className="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-white/10 hover:bg-white/20 text-slate-200 flex items-center gap-1.5 transition-colors border border-white/10"
               title="Explore all 24 FAQ topics"
             >
@@ -434,7 +511,7 @@ export const ChatWidget: React.FC = () => {
         <div className="bg-slate-50 border-t border-slate-200 px-4 py-2.5 overflow-x-auto no-scrollbar flex items-center gap-2">
           <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider shrink-0 flex items-center gap-1">
             <Sparkles className="w-3 h-3 text-orange" />
-            Suggested:
+            Quick Test:
           </span>
           {SUGGESTED_QUESTIONS.map((q, idx) => (
             <button
@@ -458,7 +535,7 @@ export const ChatWidget: React.FC = () => {
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
               rows={1}
-              placeholder="Ask about services, hours, or insurance..."
+              placeholder="Type any question to test (e.g. puppy check, desexing cost, after-hours emergency)..."
               className="w-full bg-white border border-slate-200 rounded-full px-5 pr-10 py-3 text-slate-800 text-sm focus:outline-hidden focus:ring-2 focus:ring-navy focus:border-transparent resize-none max-h-32 placeholder:text-slate-400 shadow-2xs"
             />
             {dictationSupported && (
@@ -491,6 +568,70 @@ export const ChatWidget: React.FC = () => {
             <Send className="w-5 h-5" />
           </button>
         </div>
+
+        {/* Test Suite Drawer (Overlay) */}
+        {showTesterDrawer && (
+          <div className="absolute inset-0 bg-white/98 backdrop-blur-sm z-30 flex flex-col p-4 sm:p-6 overflow-hidden animate-in fade-in duration-150">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+              <div className="flex items-center gap-2">
+                <FlaskConical className="w-5 h-5 text-orange" />
+                <div>
+                  <h3 className="font-bold text-base text-navy">
+                    Instant Question Test Suite
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Click any test prompt below to run and verify the response
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowTesterDrawer(false)}
+                className="text-xs font-semibold px-3 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 transition-colors"
+              >
+                Close ✕
+              </button>
+            </div>
+
+            {/* Test Scenarios List */}
+            <div className="flex-1 overflow-y-auto space-y-4 py-3 pr-1">
+              {TEST_SCENARIOS.map((group, gIdx) => {
+                const IconComponent = group.icon;
+                return (
+                  <div key={gIdx} className="space-y-2">
+                    <h4 className="text-xs font-bold text-navy uppercase tracking-wider flex items-center gap-1.5">
+                      <IconComponent className="w-4 h-4 text-orange" />
+                      <span>{group.category}</span>
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {group.tests.map((test, tIdx) => (
+                        <div
+                          key={tIdx}
+                          onClick={() => {
+                            setShowTesterDrawer(false);
+                            handleSend(test.prompt);
+                          }}
+                          className="p-3 bg-slate-50 hover:bg-orange/5 border border-slate-200 hover:border-orange rounded-xl transition-all cursor-pointer group flex flex-col justify-between text-left shadow-2xs"
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <p className="text-xs font-semibold text-navy group-hover:text-orange">
+                              "{test.prompt}"
+                            </p>
+                            <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-orange shrink-0 mt-0.5" />
+                          </div>
+                          <p className="text-[11px] text-slate-500 mt-1.5 flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
+                            <span className="truncate">{test.expected}</span>
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* FAQ Topic Explorer Drawer (Overlay) */}
         {showFaqDrawer && (
