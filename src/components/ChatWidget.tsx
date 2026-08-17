@@ -404,7 +404,36 @@ export const ChatWidget: React.FC = () => {
                     </div>
                   )}
 
-                  <p className="whitespace-pre-line">{msg.text}</p>
+                  <div className="space-y-1.5 leading-relaxed">
+                    {msg.text.split('\n').map((line, lIdx) => {
+                      if (!line.trim()) return <div key={lIdx} className="h-1.5" />;
+                      
+                      // Check for bullet points
+                      const isBullet = line.trim().startsWith('•') || line.trim().startsWith('-') || line.trim().startsWith('* ');
+                      const cleanLine = isBullet ? line.trim().replace(/^([•\-\*]\s*)/, '') : line;
+
+                      // Format bold **text**
+                      const parts = cleanLine.split(/(\*\*.*?\*\*)/g);
+
+                      const formattedParts = parts.map((part, pIdx) => {
+                        if (part.startsWith('**') && part.endsWith('**')) {
+                          return <strong key={pIdx} className="font-semibold text-slate-900">{part.slice(2, -2)}</strong>;
+                        }
+                        return part;
+                      });
+
+                      if (isBullet) {
+                        return (
+                          <div key={lIdx} className="flex items-start gap-2 pl-1 my-0.5">
+                            <span className="text-orange font-bold leading-none mt-1">•</span>
+                            <span className="flex-1">{formattedParts}</span>
+                          </div>
+                        );
+                      }
+
+                      return <p key={lIdx} className="my-0.5">{formattedParts}</p>;
+                    })}
+                  </div>
                 </div>
 
                 {/* Contextual Action Buttons */}
