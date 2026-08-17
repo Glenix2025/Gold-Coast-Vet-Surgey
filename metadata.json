@@ -1,0 +1,6 @@
+{
+  "name": "Gold Coast Vet Surgery - Chatbot",
+  "description": "Customer-facing FAQ chatbot for Gold Coast Vet Surgery in Surfers Paradise, QLD.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

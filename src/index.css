@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --clinic-navy: #004a80;
+    --clinic-navy-dark: #003660;
+    --clinic-orange: #f37021;
+    --clinic-orange-hover: #e05e10;
+    --clinic-light: #f8fafc;
+  }
+}
+
+.bg-navy {
+  background-color: var(--clinic-navy);
+}
+.bg-navy-dark {
+  background-color: var(--clinic-navy-dark);
+}
+.bg-orange {
+  background-color: var(--clinic-orange);
+}
+.hover\:bg-orange:hover {
+  background-color: var(--clinic-orange);
+}
+.text-navy {
+  color: var(--clinic-navy);
+}
+.text-orange {
+  color: var(--clinic-orange);
+}
+.border-navy {
+  border-color: var(--clinic-navy);
+}
+.border-orange {
+  border-color: var(--clinic-orange);
+}
+
+@layer utilities {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+}
+
+/* Custom pleasant scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
